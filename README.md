@@ -34,6 +34,16 @@ All the hardware you need is a connection between UART1 of the board (PA9-TX1 an
 
 ![](assets/boot0.jpg)
 
+### Boot Modes
+
+A couple of special MCU pins has to be set-up to proper logical values to enter the bootloader. The pins are named BOOT0 and BOOT1 on the STM32 microcontroller. Boot pins can select several modes of bootloader operation:
+
+| BOOT1  | BOOT0  | Boot Mode         | Aliasing                                    |
+| ------ | ------ | ----------------- | ------------------------------------------- |
+| X      | 0      | Main Flash Memory | Main flash memory is selected as boot space |
+| 0      | 1      | System Memory     | System memory is selected as boot space     |
+| 1      | 1      | Embedded SRAM     | Embedded SRAM is selected as boot space     |
+
 ## Pinout
 
 ![](assets\bluepill-pinout.gif)
