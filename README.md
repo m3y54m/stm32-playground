@@ -28,9 +28,9 @@ All the hardware you need is a connection between UART1 of the board (PA9-TX1 an
 
 ![](assets/bootloader.jpg)
 
-    Note: Before uploading the sketch, make sure that BOOT0 is connected to VCC and RESET the board. This will start up the microcontroller in the bootloader mode.
-
-    Each time you change the configuration of BOOT0, you should RESET the board.
+> Before uploading the sketch, make sure that BOOT0 is connected to VCC and RESET button is pressed. This will start up the microcontroller in the bootloader mode.
+ 
+> Each time you change the configuration of BOOT0, you should RESET the board.
 
 ![](assets/boot0.jpg)
 
