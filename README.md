@@ -48,6 +48,10 @@ A couple of special MCU pins has to be set-up to proper logical values to enter 
 
 ![](assets\bluepill-pinout.gif)
 
+## Notes
+
+- Adafruit SSD1306 LCD driver library did not work with the BluePill. I used [U8glib](https://github.com/olikraus/u8g2/) instead.
+
 ## References
 
 - [BlackPill F103C8 (128k)](https://docs.platformio.org/en/latest/boards/ststm32/blackpill_f103c8_128.html)
