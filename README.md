@@ -54,5 +54,5 @@ A couple of special MCU pins has to be set-up to proper logical values to enter 
 
 ## References
 
-- [BlackPill F103C8 (128k)](https://docs.platformio.org/en/latest/boards/ststm32/blackpill_f103c8_128.html)
+- [BluePill F103C8 (128k)](https://docs.platformio.org/en/latest/boards/ststm32/bluepill_f103c8_128k.html)
 - [Program STM32F4 with UART](http://stm32f4-discovery.net/2014/09/program-stm32f4-with-uart/)
