@@ -4,6 +4,15 @@
   "files.associations": {
     "main.h": "c",
     "stm32f1xx_hal.h": "c",
-    "stm32f1xx_hal_conf.h": "c"
+    "stm32f1xx_hal_conf.h": "c",
+    "iot_accel.h": "c",
+    "iot_common.h": "c",
+    "stdint.h": "c",
+    "stdbool.h": "c",
+    "stddef.h": "c",
+    "cstdio": "c",
+    "stdio.h": "c",
+    "string.h": "c",
+    "_ansi.h": "c"
   }
 }

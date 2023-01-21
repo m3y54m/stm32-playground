@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +59,14 @@ static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
+
+// Redirect printf() to UART Instance
+#define PUTCHAR_PROTOTYPE int _write(int fd, char* ptr, int len)
+PUTCHAR_PROTOTYPE
+{
+  HAL_UART_Transmit(&huart1, (uint8_t *)ptr, len, HAL_MAX_DELAY);
+  return len;
+}
 
 /* USER CODE END PFP */
 
@@ -100,7 +109,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  uint8_t hello[] = "Hello World!\r\n"; // Data to send
+  char buffer[128];
 
   /* USER CODE END 2 */
 
@@ -108,8 +117,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_UART_Transmit(&huart1, hello, sizeof(hello), 10); // Sending in normal mode
+    uint32_t millis = HAL_GetTick();
+    sprintf(buffer, "Tick Timer: %ld\r\n", millis);
+    // Sending string to UART1
+    HAL_UART_Transmit(&huart1, (uint8_t *)buffer, strlen(buffer), 10);
     
+    printf("Print Timer: %ld\r\n", millis);
+
     // Blink LED_Pin (PC13)
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
     HAL_Delay(1950);
