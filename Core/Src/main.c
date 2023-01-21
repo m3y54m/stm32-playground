@@ -100,12 +100,16 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  uint8_t hello[] = "Hello World!\r\n"; // Data to send
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    HAL_UART_Transmit(&huart1, hello, sizeof(hello), 10); // Sending in normal mode
+    
     // Blink LED_Pin (PC13)
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
     HAL_Delay(1950);

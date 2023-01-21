@@ -4,6 +4,7 @@ The BluePill STM32F103C8 board is used for this project:
 
 - **Step 1:** Configure using STM32CubeMX and create a Makefile project
 - **Step 2:** Write a simple LED blinky program on GPIO PC13
+- **Step 3:** Print "Hello World!" on UART1
 
 ## Uploading
 
@@ -57,7 +58,7 @@ A couple of special MCU pins has to be set-up to proper logical values to enter 
 
 - Adafruit SSD1306 LCD driver library did not work with the BluePill. I used [U8glib](https://github.com/olikraus/u8g2/) instead.
 
-## References
+## Resources
 
 - [STM32 toolchain for Windows](https://embeddedgeek.net/youtube/stm32-toolchain-for-windows/)
 - [STM32 toolchain for Windows - Part 1 (CubeMX, GCC, Make and OpenOCD)](https://youtu.be/PxQw5_7yI8Q)
@@ -67,3 +68,4 @@ A couple of special MCU pins has to be set-up to proper logical values to enter 
 - [Program STM32F4 with UART](http://stm32f4-discovery.net/2014/09/program-stm32f4-with-uart/)
 - [Blinking LED with STM32CubeMX and HAL](https://wiki.st.com/stm32mcu/wiki/STM32StepByStep:Step2_Blink_LED)
 - [UART and new board introduction](https://wiki.st.com/stm32mcu/wiki/STM32StepByStep:Step3_Introduction_to_the_UART)
+- [Using the STM32 UART interface with HAL ](https://visualgdb.com/tutorials/arm/stm32/uart/hal/)
