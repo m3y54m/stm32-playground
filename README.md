@@ -46,7 +46,13 @@ A couple of special MCU pins has to be set-up to proper logical values to enter 
 
 ## Pinout
 
-![](assets\bluepill-pinout.gif)
+![image](https://user-images.githubusercontent.com/1549028/213869634-1ede5169-8cdf-4ff9-8a94-26daba5fbd69.png)
+
+
+## Schematics
+
+![image](https://user-images.githubusercontent.com/1549028/213869613-a7071a58-811e-42a3-b75f-5759ac5d6baa.png)
+
 
 ## Notes
 
