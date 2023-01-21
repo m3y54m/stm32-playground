@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,6 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define ADXL345_ADDR 0x53 // Accelerometer
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,7 +50,10 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+// 1g offset of earth gravitational acceleration
+float accel_g_force_offset = 1.0f;
+// Threshold for acceleration which indicates a shock or crash
+const float shock_threshold = 4.0f;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,16 +63,22 @@ static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
-/* USER CODE BEGIN PFP */
 
-// Redirect printf() to UART Instance
-#define PUTCHAR_PROTOTYPE int _write(int fd, char* ptr, int len)
-PUTCHAR_PROTOTYPE
+/* USER CODE BEGIN PFP */
+int _write(int fd, char *ptr, int len)
 {
+  // Redirect printf() to UART Instance
   HAL_UART_Transmit(&huart1, (uint8_t *)ptr, len, HAL_MAX_DELAY);
   return len;
 }
-
+void delay_ms(uint32_t ms);
+uint64_t millis(void);
+void accel_write_reg(uint8_t addr, uint8_t val);
+void accel_read_reg(uint8_t addr, uint8_t *read_buffer, uint8_t read_size);
+void accel_init(void);
+void accel_get_sensor_data(float *values);
+void accel_calibrate_g_force(void);
+float accel_get_g_force(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -107,28 +118,32 @@ int main(void)
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
+
   /* USER CODE BEGIN 2 */
-
-  char buffer[128];
-
+  accel_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    uint32_t millis = HAL_GetTick();
-    sprintf(buffer, "Tick Timer: %ld\r\n", millis);
-    // Sending string to UART1
-    HAL_UART_Transmit(&huart1, (uint8_t *)buffer, strlen(buffer), 10);
-    
-    printf("Print Timer: %ld\r\n", millis);
+    // uint32_t ms = millis();
+    // char buffer[128];
+    // sprintf(buffer, "Tick Timer: %ld\r\n", ms);
+    // // Sending string to UART1
+    // HAL_UART_Transmit(&huart1, (uint8_t *)buffer, strlen(buffer), 10);
 
-    // Blink LED_Pin (PC13)
-    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1950);
-    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-    HAL_Delay(50);
+    float g = accel_get_g_force();
+    int q = (int)(g * 10000) / 10000;
+    int r = (int)(g * 10000) - q * 10000;
+    // printf("G-Force: %.4fg\r\n", g);
+    printf("G-Force: %d.%dg\r\n", q, r);
+
+    // // Blink LED_Pin (PC13)
+    // HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+    // HAL_Delay(1950);
+    // HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+    // HAL_Delay(50);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -347,7 +362,112 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void delay_ms(uint32_t ms)
+{
+  HAL_Delay(ms);
+}
 
+uint64_t millis(void)
+{
+  return (uint64_t)HAL_GetTick();
+}
+
+void accel_write_reg(uint8_t addr, uint8_t val)
+{
+  uint8_t slave_addr = ADXL345_ADDR;
+  slave_addr <<= 1;
+  HAL_I2C_Mem_Write(&hi2c1, slave_addr, addr, I2C_MEMADD_SIZE_8BIT, &val, 1, 100);
+}
+
+void accel_read_reg(uint8_t addr, uint8_t *read_buffer, uint8_t read_size)
+{
+  uint8_t slave_addr = ADXL345_ADDR;
+  slave_addr <<= 1;
+  HAL_I2C_Mem_Read(&hi2c1, slave_addr, addr, I2C_MEMADD_SIZE_8BIT, read_buffer, read_size, 100);
+}
+
+void accel_init(void)
+{
+  // Access to POWER_CTL register - 0x2D
+  // Write 0x08 -> 00001000 ( D3=1 for Measuring mode )
+  accel_write_reg(0x2D, 0x08);
+
+  // Access to DATA_FORMAT register - 0x31
+  // Write 0x0B -> 00001011 ( Bit D3=1 for FULL_RES, D1,D0=11 for Range -> +-16g )
+  accel_write_reg(0x31, 0x0B);
+
+  // Access to BW_RATE register - 0x2C
+  // Write 0x09 -> 00001001 ( D3,D2,D1,D0=1001 for { Data Rate -> 50Hz , BW -> 25Hz , IDD -> 45uA } )
+  accel_write_reg(0x2C, 0x09);
+
+  delay_ms(10);
+
+  // Update `accel_g_force_offset`
+  accel_calibrate_g_force();
+}
+
+void accel_get_sensor_data(float *values)
+{
+  int16_t sensor_data[3];
+  uint8_t read_buffer[6];
+
+  // Access to DATA registers - 0x32 ~ 0x37 (6 registers)
+  // Read 6 registers total, each axis value is stored in 2 registers
+  accel_read_reg(0x32, read_buffer, 6);
+
+  sensor_data[0] = (((int16_t)read_buffer[1]) << 8) | read_buffer[0];
+  sensor_data[1] = (((int16_t)read_buffer[3]) << 8) | read_buffer[2];
+  sensor_data[2] = (((int16_t)read_buffer[5]) << 8) | read_buffer[4];
+
+  // printf("X: %d, Y: %d, Z: %d", sensor_data[0], sensor_data[1], sensor_data[2]);
+  // printf("\r\n");
+
+  // For all g-ranges in full resolution mode, sensitivity is 256
+  // All values are in g units
+  // To convert them to m/s^2 just multiply them by 9.80665
+  values[0] = (float)sensor_data[0] / 256; // X-Axis
+  values[1] = (float)sensor_data[1] / 256; // Y-Axis
+  values[2] = (float)sensor_data[2] / 256; // Z-Axis
+}
+
+void accel_calibrate_g_force(void)
+{
+  float values[3];
+  const uint16_t READINGS_COUNT = 100;
+  float values_sum[3] = {0.0f};
+
+  // Read and sum-up readings several times to reduce noise
+  for (uint8_t i = 0; i < READINGS_COUNT; i++)
+  {
+    // Get g-force in all 3-axis
+    accel_get_sensor_data(values);
+
+    values_sum[0] += values[0];
+    values_sum[1] += values[1];
+    values_sum[2] += values[2];
+  }
+  // Calculate the average of all readings
+  values[0] = values_sum[0] / READINGS_COUNT;
+  values[1] = values_sum[1] / READINGS_COUNT;
+  values[2] = values_sum[2] / READINGS_COUNT;
+
+  // Calculate magnitude of g-force and update offset
+  accel_g_force_offset = (float)sqrt(pow(values[0], 2) + pow(values[1], 2) + pow(values[2], 2));
+
+  // printf("Magnitude of acceleration at rest: %.4fg\r\n", accel_g_force_offset);
+  int q = (int)(accel_g_force_offset * 10000) / 10000;
+  int r = (int)(accel_g_force_offset * 10000) - q * 10000;
+  printf("Magnitude of acceleration at rest: %d.%dg\r\n", q, r);
+}
+
+float accel_get_g_force(void)
+{
+  float values[3];
+  // Get g-force in all 3-axis
+  accel_get_sensor_data(values);
+  // Calculate magnitude of g-force (removed 1g offset of earth gravitational acceleration)
+  return (float)fabs((float)sqrt(pow(values[0], 2) + pow(values[1], 2) + pow(values[2], 2)) - accel_g_force_offset);
+}
 /* USER CODE END 4 */
 
 /**

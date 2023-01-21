@@ -13,6 +13,7 @@
     "cstdio": "c",
     "stdio.h": "c",
     "string.h": "c",
-    "_ansi.h": "c"
+    "_ansi.h": "c",
+    "math.h": "c"
   }
 }
