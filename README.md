@@ -1,10 +1,9 @@
-# Arduino + BluePill
+# Getting Started with STM32 Programming
 
-## PlatformIO Project Configuration
+The BluePill STM32F103C8 board is used for this project:
 
-- Platform: BlackPill F103C8 (128k)
-- Framework: Arduino
-- Upload Method: serial
+- **Step 1:** Configure using STM32CubeMX and create a Makefile project
+- **Step 2:** Write a simple LED blinky program on GPIO PC13
 
 ## Uploading
 
@@ -60,5 +59,9 @@ A couple of special MCU pins has to be set-up to proper logical values to enter 
 
 ## References
 
-- [BluePill F103C8 (128k)](https://docs.platformio.org/en/latest/boards/ststm32/bluepill_f103c8_128k.html)
+- [STM32 toolchain for Windows](https://embeddedgeek.net/youtube/stm32-toolchain-for-windows/)
+- [STM32 toolchain for Windows - Part 1 (CubeMX, GCC, Make and OpenOCD)](https://youtu.be/PxQw5_7yI8Q)
+- [Visual Studio Code for STM32 development and debugging - Part 2](https://youtu.be/xaC5oWwzOt0)
+- [STM32 Startup code, Bare metal - Part 3](https://youtu.be/7stymN3eYw0)
+- [stm32-for-vscode](https://marketplace.visualstudio.com/items?itemName=bmd.stm32-for-vscode)
 - [Program STM32F4 with UART](http://stm32f4-discovery.net/2014/09/program-stm32f4-with-uart/)
