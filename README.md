@@ -26,13 +26,13 @@ This method is implemented in PlatformIO under the name `upload_protocol` of `se
 
 All the hardware you need is a connection between UART1 of the board (PA9-TX1 and PA10-RX1) and a USB to serial dongle connected to your computer.
 
-![](assets/bootloader.jpg)
+![image](https://user-images.githubusercontent.com/1549028/213869831-610a84d2-9df3-4d2a-bf80-3e32a9a684b5.png)
 
 > Before uploading the sketch, make sure that BOOT0 is connected to VCC and RESET button is pressed. This will start up the microcontroller in the bootloader mode.
  
 > Each time you change the configuration of BOOT0, you should RESET the board.
 
-![](assets/boot0.jpg)
+![image](https://user-images.githubusercontent.com/1549028/213869836-5bc00653-19df-4bdc-853b-94aeb717bb58.png)
 
 ### Boot Modes
 
