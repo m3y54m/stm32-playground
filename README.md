@@ -65,3 +65,5 @@ A couple of special MCU pins has to be set-up to proper logical values to enter 
 - [STM32 Startup code, Bare metal - Part 3](https://youtu.be/7stymN3eYw0)
 - [stm32-for-vscode](https://marketplace.visualstudio.com/items?itemName=bmd.stm32-for-vscode)
 - [Program STM32F4 with UART](http://stm32f4-discovery.net/2014/09/program-stm32f4-with-uart/)
+- [Blinking LED with STM32CubeMX and HAL](https://wiki.st.com/stm32mcu/wiki/STM32StepByStep:Step2_Blink_LED)
+- [UART and new board introduction](https://wiki.st.com/stm32mcu/wiki/STM32StepByStep:Step3_Introduction_to_the_UART)
