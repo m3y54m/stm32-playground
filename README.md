@@ -6,6 +6,9 @@ The BluePill STM32F103C8 board is used for this project:
 - **Step 2:** Write a simple LED blinky program on GPIO PC13
 - **Step 3:** Print "Hello World!" on UART1
 
+![image](https://github.com/m3y54m/start-stm32-bluepill/assets/1549028/1b6a010c-b83e-449e-8bc2-77c649784068)
+
+
 ## Uploading
 
 The best way to upload the sketch is to use ST-Link or J-Link debuggers. But due to the additional hardware costs you may want to use a cheaper alternative method.
